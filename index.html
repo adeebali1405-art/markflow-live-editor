@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MarkFlow — Markdown Editor with Live Preview By M.Adeeb Ai Softwer Developer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0d0c;--panel:#121514;--panel2:#171b19;--line:#242a27;--text:#e6ebe8;--mute:#8a948f;--acc:#B9FF66;--acc-ink:#0b0d0c;--code:#0d100f;--sans:'Inter',system-ui,sans-serif;--head:'Space Grotesk','Inter',sans-serif;--mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root[data-theme="light"]{--bg:#f4f6f2;--panel:#fff;--panel2:#f0f3ee;--line:#dde3da;--text:#1a201c;--mute:#667069;--acc:#4c8a00;--acc-ink:#fff;--code:#f1f4ee}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--text);font:14px/1.5 var(--sans);display:flex;flex-direction:column;overflow:hidden}
+svg.i{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+header{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--line);background:var(--panel)}
+.brand{display:flex;align-items:center;gap:10px;font:700 18px var(--head);letter-spacing:-.02em}
+.brand small{font:500 11px var(--sans);color:var(--mute);letter-spacing:0;display:block;margin-top:-2px}
+.sp{flex:1}
+.seg{display:flex;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:8px;transition:background .15s,color .15s,transform .1s}
+button:hover{background:var(--line)}
+button:active{transform:scale(.96)}
+button:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
+.seg button[aria-pressed=true]{background:var(--acc);color:var(--acc-ink);font-weight:600}
+.btn{border:1px solid var(--line);background:var(--panel2)}
+.btn.pri{background:var(--acc);color:var(--acc-ink);border-color:var(--acc);font-weight:600}
+.btn.pri:hover{filter:brightness(1.08)}
+.tools{display:flex;gap:2px;padding:6px 12px;border-bottom:1px solid var(--line);background:var(--panel);overflow-x:auto}
+.tools button{padding:7px 9px;color:var(--mute)}
+.tools button:hover{color:var(--acc)}
+.tools .div{width:1px;background:var(--line);margin:4px 6px;flex:none}
+main{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr}
+main[data-view=edit] .pv,main[data-view=preview] .ed{display:none}
+main[data-view=edit],main[data-view=preview]{grid-template-columns:1fr}
+.pane{min-width:0;min-height:0;display:flex;flex-direction:column}
+.ed{border-right:1px solid var(--line)}
+.lbl{padding:6px 16px;font:600 11px var(--head);letter-spacing:.12em;text-transform:uppercase;color:var(--mute);display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--line)}
+.lbl::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--acc);box-shadow:0 0 10px var(--acc)}
+textarea{flex:1;width:100%;resize:none;border:0;outline:0;background:var(--bg);color:var(--text);font:13.5px/1.7 var(--mono);padding:18px 20px;tab-size:2}
+textarea::selection{background:color-mix(in srgb,var(--acc) 35%,transparent)}
+#pv{flex:1;overflow:auto;padding:22px 28px 60px;background:var(--panel)}
+.md{max-width:760px;margin:0 auto;line-height:1.75;word-wrap:break-word}
+.md h1,.md h2,.md h3,.md h4{font-family:var(--head);letter-spacing:-.02em;line-height:1.25;margin:1.4em 0 .5em}
+.md h1{font-size:2em;border-bottom:1px solid var(--line);padding-bottom:.3em}
+.md h1:first-child{margin-top:0}
+.md h2{font-size:1.5em}.md h3{font-size:1.2em;color:var(--acc)}
+.md p{margin:.8em 0}
+.md a{color:var(--acc);text-decoration:underline;text-underline-offset:3px}
+.md code{font:.88em var(--mono);background:var(--code);border:1px solid var(--line);padding:.15em .4em;border-radius:6px;color:var(--acc)}
+.md pre{position:relative;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:16px;overflow-x:auto;margin:1em 0}
+.md pre::before{content:attr(data-lang);position:absolute;top:6px;right:12px;font:500 10px var(--mono);color:var(--mute);text-transform:uppercase}
+.md pre code{background:none;border:0;padding:0;color:var(--text);font-size:13px;line-height:1.6}
+.t-k{color:#ff7ab6}.t-s{color:var(--acc)}.t-c{color:var(--mute);font-style:italic}.t-n{color:#ffb86b}
+.md blockquote{margin:1em 0;padding:.2em 1em;border-left:3px solid var(--acc);background:var(--panel2);border-radius:0 10px 10px 0;color:var(--mute)}
+.md hr{border:0;border-top:1px dashed var(--line);margin:2em 0}
+.md ul,.md ol{padding-left:1.4em}
+.md li{margin:.25em 0}.md li::marker{color:var(--acc)}
+.md li.task{list-style:none;margin-left:-1.3em}
+.md li.task input{accent-color:var(--acc);margin-right:.6em}
+.md img{max-width:100%;border-radius:12px}
+.md .tw{overflow-x:auto;margin:1em 0}
+.md table{border-collapse:collapse;width:100%}
+.md th,.md td{border:1px solid var(--line);padding:8px 12px;text-align:left}
+.md th{background:var(--panel2);font-family:var(--head)}
+footer{display:flex;gap:18px;align-items:center;padding:7px 16px;border-top:1px solid var(--line);background:var(--panel);font-size:12px;color:var(--mute);overflow-x:auto;white-space:nowrap}
+footer span{display:inline-flex;gap:6px;align-items:center}
+footer b{color:var(--text);font-weight:600}
+.ok{color:var(--acc)}
+@media(max-width:760px){main[data-view=split]{grid-template-columns:1fr;grid-template-rows:1fr 1fr}.ed{border-right:0;border-bottom:1px solid var(--line)}.hide-s{display:none}header{padding:8px 12px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#B9FF66"/><stop offset="1" stop-color="#4fd18b"/></linearGradient></defs><rect width="34" height="34" rx="10" fill="url(#g)"/><path d="M8 24V10l5 6 5-6v14M22 18l3 3 3-3M25 21v-8" fill="none" stroke="#0b0d0c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div>MarkFlow By M.Adeeb Ai Softwer Developer<small class="hide-s">Write. Preview. Instantly By M.Adeeb Ai Softwer Developer.</small></div>
+  </div>
+  <div class="sp"></div>
+  <div class="seg" role="group" aria-label="View mode" id="views">
+    <button data-v="edit" aria-pressed="false" title="Editor only"><svg class="i" data-ic="edit"></svg><span class="hide-s">Edit</span></button>
+    <button data-v="split" aria-pressed="true" title="Split view"><svg class="i" data-ic="split"></svg><span class="hide-s">Split</span></button>
+    <button data-v="preview" aria-pressed="false" title="Preview only"><svg class="i" data-ic="eye"></svg><span class="hide-s">Preview</span></button>
+  </div>
+  <button class="btn" id="theme" title="Toggle theme" aria-label="Toggle theme"><svg class="i" data-ic="sun"></svg></button>
+  <button class="btn pri" id="copyHtml" title="Copy rendered HTML"><svg class="i" data-ic="code"></svg><span class="hide-s">Copy HTML</span></button>
+</header>
+
+<div class="tools" role="toolbar" aria-label="Formatting">
+  <button data-a="h" title="Heading"><svg class="i" data-ic="h"></svg></button>
+  <button data-a="b" title="Bold (Ctrl+B)"><svg class="i" data-ic="bold"></svg></button>
+  <button data-a="i" title="Italic (Ctrl+I)"><svg class="i" data-ic="italic"></svg></button>
+  <button data-a="s" title="Strikethrough"><svg class="i" data-ic="strike"></svg></button>
+  <span class="div"></span>
+  <button data-a="ic" title="Inline code"><svg class="i" data-ic="code"></svg></button>
+  <button data-a="cb" title="Code block"><svg class="i" data-ic="block"></svg></button>
+  <button data-a="l" title="Link (Ctrl+K)"><svg class="i" data-ic="link"></svg></button>
+  <button data-a="img" title="Image"><svg class="i" data-ic="image"></svg></button>
+  <span class="div"></span>
+  <button data-a="ul" title="Bullet list"><svg class="i" data-ic="list"></svg></button>
+  <button data-a="ol" title="Numbered list"><svg class="i" data-ic="olist"></svg></button>
+  <button data-a="t" title="Task list"><svg class="i" data-ic="check"></svg></button>
+  <button data-a="q" title="Quote"><svg class="i" data-ic="quote"></svg></button>
+  <button data-a="hr" title="Divider"><svg class="i" data-ic="minus"></svg></button>
+  <button data-a="tb" title="Table"><svg class="i" data-ic="table"></svg></button>
+  <span class="div"></span>
+  <button data-a="copy" title="Copy Markdown"><svg class="i" data-ic="copy"></svg></button>
+  <button data-a="clear" title="Clear editor"><svg class="i" data-ic="trash"></svg></button>
+</div>
+
+<main id="main" data-view="split">
+  <section class="pane ed"><div class="lbl">Markdown</div><textarea id="ed" spellcheck="false" aria-label="Markdown input"></textarea></section>
+  <section class="pane pv"><div class="lbl">Live Preview</div><div id="pv"><article class="md" id="out"></article></div></section>
+</main>
+
+<footer>
+  <span><svg class="i" data-ic="type"></svg><b id="sW">0</b> words</span>
+  <span><b id="sC">0</b> chars</span>
+  <span><b id="sL">0</b> lines</span>
+  <span><svg class="i" data-ic="clock"></svg><b id="sR">0</b> min read</span>
+  <span><svg class="i" data-ic="zap"></svg>rendered in <b id="sT">0</b> ms</span>
+  <span class="ok" id="sv"><svg class="i" data-ic="cloud"></svg>Autosave on</span>
+</footer>
+
+<script>
+"use strict";
+/* ---------- Icons (inline SVG, zero deps) ---------- */
+const IC={edit:'M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z',split:'M3 5h18v14H3zM12 5v14',eye:'M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12zM12 9a3 3 0 100 6 3 3 0 000-6z',sun:'M12 17a5 5 0 100-10 5 5 0 000 10zM12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4',moon:'M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z',code:'M16 18l6-6-6-6M8 6l-6 6 6 6',h:'M6 4v16M18 4v16M6 12h12',bold:'M6 4h8a4 4 0 010 8H6zM6 12h9a4 4 0 010 8H6z',italic:'M19 4h-9M14 20H5M15 4L9 20',strike:'M16 4H9a3 3 0 00-2.8 4M14 12a4 4 0 010 8H6M4 12h16',block:'M8 3H5a2 2 0 00-2 2v14a2 2 0 002 2h3M16 3h3a2 2 0 012 2v14a2 2 0 01-2 2h-3M9 9l-2 3 2 3M15 9l2 3-2 3',link:'M10 13a5 5 0 007.5.5l3-3a5 5 0 00-7-7l-1.7 1.7M14 11a5 5 0 00-7.5-.5l-3 3a5 5 0 007 7l1.7-1.7',image:'M3 3h18v18H3zM8.5 10a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM21 15l-5-5L5 21',list:'M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01',olist:'M10 6h11M10 12h11M10 18h11M4 6h1v4M4 10h2M6 18H4c0-1 2-2 2-3s-1-1.5-2-1',check:'M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11',quote:'M3 21c3 0 7-1 7-8V5H3v8h4M14 21c3 0 7-1 7-8V5h-7v8h4',minus:'M5 12h14',table:'M3 3h18v18H3zM3 9h18M3 15h18M9 3v18M15 3v18',copy:'M9 9h11v11H9zM5 15V5a1 1 0 011-1h10',trash:'M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6',type:'M4 7V4h16v3M9 20h6M12 4v16',clock:'M12 22a10 10 0 100-20 10 10 0 000 20zM12 6v6l4 2',zap:'M13 2L3 14h9l-1 8 10-12h-9z',cloud:'M18 10h-1.3A8 8 0 109 20h9a5 5 0 000-10z'};
+const paint=()=>document.querySelectorAll('svg.i[data-ic]').forEach(s=>{s.setAttribute('viewBox','0 0 24 24');s.innerHTML=`<path d="${IC[s.dataset.ic]}"/>`});
+
+/* ---------- Markdown engine (regex-based, XSS-safe) ---------- */
+const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const HL=/(\/\/.*|\/\*[\s\S]*?\*\/)|("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`)|\b(const|let|var|function|return|if|else|for|while|import|from|export|default|class|new|async|await|try|catch|throw|true|false|null|undefined)\b|\b(\d+\.?\d*)\b/g;
+function highlight(code){
+  let out='',last=0,m;HL.lastIndex=0;
+  while((m=HL.exec(code))){
+    out+=esc(code.slice(last,m.index));
+    out+=`<span class="t-${m[1]?'c':m[2]?'s':m[3]?'k':'n'}">${esc(m[0])}</span>`;
+    last=HL.lastIndex;
+  }
+  return out+esc(code.slice(last));
+}
+function inline(raw){
+  const codes=[];
+  let s=esc(raw).replace(/`([^`]+)`/g,(_,c)=>`\u0000${codes.push(c)-1}\u0000`);
+  s=s.replace(/!\[([^\]]*)\]\((https?:[^)\s]+)\)/g,'<img src="$2" alt="$1" loading="lazy">')
+     .replace(/\[([^\]]+)\]\((https?:[^)\s]+)\)/g,'<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+     .replace(/\*\*(.+?)\*\*|__(.+?)__/g,(_,a,b)=>`<strong>${a||b}</strong>`)
+     .replace(/(^|[^*\w])\*(?!\s)([^*]+?)\*(?!\*)/g,'$1<em>$2</em>')
+     .replace(/(^|[^_\w])_(?!\s)([^_]+?)_(?!\w)/g,'$1<em>$2</em>')
+     .replace(/~~(.+?)~~/g,'<del>$1</del>');
+  return s.replace(/\u0000(\d+)\u0000/g,(_,i)=>`<code>${codes[i]}</code>`);
+}
+const LI=/^\s*([-*+]|\d+\.)\s+/, ROW=/^\|.*\|\s*$/, SEP=/^\|?\s*:?-{2,}:?\s*(\|\s*:?-{2,}:?\s*)*\|?\s*$/;
+const cells=r=>r.trim().replace(/^\||\|$/g,'').split('|').map(c=>c.trim());
+function parse(md){
+  const L=md.replace(/\r/g,'').split('\n'),o=[];let i=0,m;
+  while(i<L.length){
+    const l=L[i];
+    if(/^```/.test(l)){
+      const lang=l.slice(3).trim(),b=[];i++;
+      while(i<L.length&&!/^```/.test(L[i]))b.push(L[i++]);i++;
+      const body=b.join('\n');
+      o.push(`<pre data-lang="${esc(lang)}"><code>${/^(js|javascript|ts|typescript|json)$/i.test(lang)?highlight(body):esc(body)}</code></pre>`);continue;
+    }
+    if((m=l.match(/^(#{1,6})\s+(.*?)\s*#*$/))){o.push(`<h${m[1].length}>${inline(m[2])}</h${m[1].length}>`);i++;continue}
+    if(/^(-{3,}|\*{3,}|_{3,})\s*$/.test(l)){o.push('<hr>');i++;continue}
+    if(/^>/.test(l)){const b=[];while(i<L.length&&/^>/.test(L[i]))b.push(L[i++].replace(/^>\s?/,''));o.push(`<blockquote>${parse(b.join('\n'))}</blockquote>`);continue}
+    if(ROW.test(l)&&SEP.test(L[i+1]||'')){
+      const h=cells(l);i+=2;const rows=[];
+      while(i<L.length&&ROW.test(L[i]))rows.push(cells(L[i++]));
+      o.push(`<div class="tw"><table><thead><tr>${h.map(c=>`<th>${inline(c)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${inline(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`);continue;
+    }
+    if(LI.test(l)){
+      const ord=/^\s*\d+\./.test(l),items=[];
+      while(i<L.length&&LI.test(L[i])){
+        const t=L[i++].replace(LI,''),k=t.match(/^\[([ xX])\]\s+(.*)/);
+        items.push(k?`<li class="task"><input type="checkbox" disabled${k[1]!==' '?' checked':''}>${inline(k[2])}</li>`:`<li>${inline(t)}</li>`);
+      }
+      o.push(ord?`<ol>${items.join('')}</ol>`:`<ul>${items.join('')}</ul>`);continue;
+    }
+    if(!l.trim()){i++;continue}
+    const p=[];
+    while(i<L.length&&L[i].trim()&&!/^(```|#{1,6}\s|>|(-{3,}|\*{3,})\s*$)/.test(L[i])&&!LI.test(L[i]))p.push(L[i++]);
+    if(!p.length){p.push(L[i++])}
+    o.push(`<p>${p.map(inline).join('<br>')}</p>`);
+  }
+  return o.join('\n');
+}
+
+/* ---------- App ---------- */
+const $=id=>document.getElementById(id),ed=$('ed'),out=$('out'),pv=$('pv');
+const T='```';
+const SAMPLE=`# Welcome to MarkFlow ✨
+
+Write **Markdown** on the left and watch it render *instantly* on the right. Try ~~old~~ new ideas with \`inline code\`.
+
+## Features
+
+- [x] Live preview with **debounced** rendering
+- [x] Custom regex-based parser (no libraries)
+- [x] Syntax highlighting, tables, tasks & more
+- [ ] Your next idea goes here
+
+> Fast parsing. Safe output. Zero dependencies.
+
+${T}js
+// Debounce: wait until the user stops typing
+const debounce = (fn, ms = 120) => {
+  let t;
+  return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+};
+${T}
+
+| Feature | Status |
+|---------|:------:|
+| Parser  | Done   |
+| Preview | Live   |
+
+[Open GitHub](https://github.com/adeebali1405-art)
+`;
+
+const debounce=(fn,ms=120)=>{let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms)}};
+const store={get(k){try{return localStorage.getItem(k)}catch{return null}},set(k,v){try{localStorage.setItem(k,v);return true}catch{return false}}};
+
+function stats(){
+  const v=ed.value,w=(v.trim().match(/\S+/g)||[]).length;
+  $('sW').textContent=w;$('sC').textContent=v.length;$('sL').textContent=v?v.split('\n').length:0;
+  $('sR').textContent=Math.max(1,Math.ceil(w/200));
+}
+function render(){
+  const t0=performance.now();
+  out.innerHTML=parse(ed.value);
+  $('sT').textContent=(performance.now()-t0).toFixed(1);
+  stats();
+}
+const save=debounce(()=>{$('sv').lastChild.textContent=store.set('markflow:doc',ed.value)?'Saved':'Autosave unavailable'},500);
+const renderD=debounce(render,120);
+const onInput=()=>{renderD();save();$('sv').lastChild.textContent='Saving…'};
+ed.addEventListener('input',onInput);
+
+/* scroll sync */
+let lock=false;
+ed.addEventListener('scroll',()=>{
+  if(lock||ed.scrollHeight===ed.clientHeight)return;
+  lock=true;pv.scrollTop=ed.scrollTop/(ed.scrollHeight-ed.clientHeight)*(pv.scrollHeight-pv.clientHeight);
+  requestAnimationFrame(()=>lock=false);
+});
+
+/* formatting actions */
+function wrap(b,a=b,ph='text'){
+  const s=ed.selectionStart,e=ed.selectionEnd,t=ed.value.slice(s,e)||ph;
+  ed.setRangeText(b+t+a,s,e,'end');ed.setSelectionRange(s+b.length,s+b.length+t.length);ed.focus();onInput();
+}
+function prefix(p){
+  const s=ed.selectionStart,e=ed.selectionEnd,ls=ed.value.lastIndexOf('\n',s-1)+1;
+  const seg=ed.value.slice(ls,e).split('\n').map((x,n)=>typeof p==='function'?p(n)+x:p+x).join('\n');
+  ed.setRangeText(seg,ls,e,'end');ed.focus();onInput();
+}
+function insert(txt){const s=ed.selectionStart;ed.setRangeText(txt,s,ed.selectionEnd,'end');ed.focus();onInput()}
+const ACT={
+  h:()=>prefix('## '),b:()=>wrap('**'),i:()=>wrap('*'),s:()=>wrap('~~'),ic:()=>wrap('`'),
+  cb:()=>wrap('\n'+T+'js\n','\n'+T+'\n','// code'),l:()=>wrap('[',']( https://)'.replace(' ',''),'link text'),
+  img:()=>insert('![alt text](https://)'),ul:()=>prefix('- '),ol:()=>prefix(n=>`${n+1}. `),t:()=>prefix('- [ ] '),q:()=>prefix('> '),
+  hr:()=>insert('\n\n---\n\n'),tb:()=>insert('\n| Column A | Column B |\n|----------|----------|\n| Cell     | Cell     |\n'),
+  copy:()=>copy(ed.value,'Markdown copied'),clear:()=>{if(ed.value&&confirm('Clear the editor?')){ed.value='';onInput();render()}}
+};
+document.querySelector('.tools').addEventListener('click',e=>{const b=e.target.closest('button[data-a]');if(b)ACT[b.dataset.a]()});
+
+ed.addEventListener('keydown',e=>{
+  const mod=e.ctrlKey||e.metaKey,k=e.key.toLowerCase();
+  if(mod&&k==='b'){e.preventDefault();ACT.b()}
+  else if(mod&&k==='i'){e.preventDefault();ACT.i()}
+  else if(mod&&k==='k'){e.preventDefault();ACT.l()}
+  else if(e.key==='Tab'){e.preventDefault();insert('  ')}
+});
+
+/* clipboard + toast */
+let tt;
+function flash(msg){const s=$('sv');s.lastChild.textContent=msg;clearTimeout(tt);tt=setTimeout(()=>s.lastChild.textContent='Autosave on',1800)}
+async function copy(txt,msg){try{await navigator.clipboard.writeText(txt);flash(msg)}catch{ed.select();flash('Copy blocked — press Ctrl+C')}}
+$('copyHtml').onclick=()=>copy(out.innerHTML,'HTML copied');
+
+/* view modes + theme */
+$('views').addEventListener('click',e=>{
+  const b=e.target.closest('button[data-v]');if(!b)return;
+  $('main').dataset.view=b.dataset.v;
+  document.querySelectorAll('#views button').forEach(x=>x.setAttribute('aria-pressed',x===b));
+});
+function setTheme(t){
+  document.documentElement.dataset.theme=t;
+  const s=$('theme').firstElementChild;s.dataset.ic=t==='dark'?'sun':'moon';paint();store.set('markflow:theme',t);
+}
+$('theme').onclick=()=>setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');
+
+/* init */
+document.documentElement.dataset.theme=store.get('markflow:theme')||'dark';
+paint();setTheme(document.documentElement.dataset.theme);
+ed.value=store.get('markflow:doc')||SAMPLE;
+render();
+</script>
+</body>
+</html>
